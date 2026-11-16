@@ -1,0 +1,75 @@
+name: Daily TikTok post
+
+on:
+  schedule:
+    - cron: "47 15 * * *"   # 18:47 İstanbul (UTC+3)
+  workflow_dispatch:
+    inputs:
+      dry_run:
+        description: "Klibi üret ama TikTok'a gönderme"
+        type: boolean
+        default: true
+
+permissions:
+  contents: write
+
+concurrency:
+  group: daily-post
+  cancel-in-progress: false
+
+jobs:
+  post:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install ffmpeg and yt-dlp
+        run: |
+          sudo apt-get update -qq
+          sudo apt-get install -y -qq ffmpeg
+          pip install -r requirements.txt
+
+      - name: Run tests
+        run: python -m unittest discover -s tests -v
+
+      - name: Make clip and post
+        env:
+          TIKTOK_CLIENT_KEY: ${{ secrets.TIKTOK_CLIENT_KEY }}
+          TIKTOK_CLIENT_SECRET: ${{ secrets.TIKTOK_CLIENT_SECRET }}
+          TIKTOK_REFRESH_TOKEN: ${{ secrets.TIKTOK_REFRESH_TOKEN }}
+          TIKTOK_PRIVACY: ${{ vars.TIKTOK_PRIVACY || 'SELF_ONLY' }}
+          DRY: ${{ github.event_name == 'workflow_dispatch' && inputs.dry_run }}
+        run: |
+          if [ "$DRY" = "true" ]; then python -m autopost.run --dry-run; else python -m autopost.run; fi
+
+      - name: Save clip for inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: clip
+          path: out/*.mp4
+          retention-days: 3
+          if-no-files-found: ignore
+
+      - name: Rotate refresh token secret (optional)
+        if: always()
+        env:
+          GH_TOKEN: ${{ secrets.SECRETS_PAT }}
+        run: |
+          f="$RUNNER_TEMP/new_refresh_token"
+          if [ -f "$f" ]; then
+            if [ -n "$GH_TOKEN" ]; then gh secret set TIKTOK_REFRESH_TOKEN --repo "$GITHUB_REPOSITORY" < "$f"
+            else echo "::warning::TikTok refresh token değişti ama SECRETS_PAT yok; secret elle güncellenmeli."; fi
+          fi
+
+      - name: Commit state
+        run: |
+          git config user.name "autopost-bot"
+          git config user.email "autopost-bot@users.noreply.github.com"
+          git add state/
+          git diff --cached --quiet || (git commit -m "state: günlük paylaşım kaydı" && git push)
