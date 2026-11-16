@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Privacy Policy – CYNORAPHONK Autopost</title>
+<style>body{font:16px/1.6 system-ui,sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;color:#222}h1,h2{line-height:1.25}</style>
+</head>
+<body>
+<h1>Privacy Policy</h1>
+<p>Last updated: 16 November 2026</p>
+
+<p>CYNORAPHONK Autopost ("the app") is a small personal tool operated by Eren Şimşir (Cynorra). It posts short video clips of the operator's own music to the operator's own TikTok account. It is not offered to the public and has no sign-up, accounts or users other than its operator.</p>
+
+<h2>What data the app handles</h2>
+<ul>
+  <li><strong>TikTok authorization tokens</strong> of the operator's own TikTok account (access and refresh tokens), obtained through TikTok Login Kit with the <code>user.info.basic</code> and <code>video.publish</code> scopes. They are stored only as encrypted secrets in the operator's private GitHub Actions settings.</li>
+  <li><strong>Basic profile and posting information</strong> returned by TikTok (for example the posting options available to the account and the status of a publish request), used only to publish the clip.</li>
+  <li><strong>A posting log</strong> (track name, time, TikTok publish ID) stored in the operator's own repository.</li>
+</ul>
+
+<h2>What the app does not do</h2>
+<ul>
+  <li>It does not collect, store or process personal data of any other person.</li>
+  <li>It does not read, download or analyze other users' content, followers or messages.</li>
+  <li>It does not sell, share, rent or disclose data to third parties, and it does not use data for advertising or profiling.</li>
+</ul>
+
+<h2>How data is used</h2>
+<p>Tokens are used solely to publish the operator's own videos to the operator's own TikTok account at the operator's request. Video clips are generated from the operator's own music and are processed temporarily on GitHub Actions runners, then discarded.</p>
+
+<h2>Retention and deletion</h2>
+<p>Tokens remain stored until the operator removes the secrets from GitHub. The authorization can be revoked at any time in TikTok under Settings and privacy → Security &amp; permissions → Apps and services, which immediately invalidates the stored tokens.</p>
+
+<h2>Contact</h2>
+<p>Questions about this policy: open an issue at <a href="https://github.com/cynorra/autopost/issues">github.com/cynorra/autopost/issues</a>.</p>
+
+<p>This policy may be updated; the date above shows the latest revision.</p>
+</body>
+</html>
