@@ -47,6 +47,13 @@ def refresh_access_token(client_key: str, client_secret: str, refresh_token: str
     return resp  # access_token, refresh_token, expires_in, open_id, scope ...
 
 
+def user_info(access_token: str) -> dict:
+    """user.info.basic kapsamı: bağlı hesabın adı ve kimliği."""
+    resp = _http("GET", f"{API}/v2/user/info/?fields=open_id,display_name,avatar_url",
+                 {"Authorization": f"Bearer {access_token}"})
+    return _check(resp, "user_info").get("user", {})
+
+
 def _auth(access_token: str) -> dict:
     return {"Authorization": f"Bearer {access_token}", "Content-Type": "application/json; charset=UTF-8"}
 
@@ -122,3 +129,6 @@ if __name__ == "__main__":  # python -m autopost.tiktok  -> yetkilendirme yardı
     tok = exchange_code(key, secret, code, redirect)
     print("\nrefresh_token (GitHub secret TIKTOK_REFRESH_TOKEN olarak kaydet):\n", tok.get("refresh_token"))
     print("scope:", tok.get("scope"), "| open_id:", tok.get("open_id"))
+    if tok.get("access_token"):
+        who = user_info(tok["access_token"])
+        print("Bağlı TikTok hesabı:", who.get("display_name"), "| open_id:", who.get("open_id"))

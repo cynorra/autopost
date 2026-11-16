@@ -1,0 +1,57 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>CYNORAPHONK Autopost</title>
+<style>
+  body{font:16px/1.6 system-ui,sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;color:#eee;background:#0b0b10}
+  a{color:#ff7a3c} h1{margin-bottom:.2rem}
+  .card{background:#16161f;border:1px solid #2a2a38;border-radius:12px;padding:1.2rem 1.4rem;margin:1.2rem 0}
+  button{font:600 16px system-ui;background:#ff2d55;color:#fff;border:0;border-radius:8px;padding:.7rem 1.2rem;cursor:pointer}
+  small{color:#9a9aab}
+</style>
+</head>
+<body>
+<h1>CYNORAPHONK Autopost</h1>
+<p><small>Personal tool by Cynorra</small></p>
+
+<p>Turns the creator's own original phonk tracks into short vertical clips and publishes them to the creator's own TikTok account on a daily schedule.</p>
+
+<div class="card">
+  <h2>Step 1 &ndash; Connect your TikTok account</h2>
+  <p>The creator signs in once with TikTok Login Kit and grants permission to publish videos to their own account.</p>
+  <button id="connect">Connect TikTok</button>
+  <p><small>Scopes requested: <code>user.info.basic</code>, <code>video.publish</code></small></p>
+</div>
+
+<div class="card">
+  <h2>How it works</h2>
+  <ol>
+    <li>Connect the TikTok account (this page).</li>
+    <li>Once a day a clip is generated from one of the creator's tracks.</li>
+    <li>The clip is uploaded and published to the connected account with the TikTok Content Posting API.</li>
+  </ol>
+</div>
+
+<p><a href="terms.html">Terms of Service</a> &middot; <a href="privacy.html">Privacy Policy</a></p>
+
+<script>
+  // client_key is a public identifier (not a secret).
+  var CLIENT_KEY = "awv2y96b3j3tvchu";
+  var REDIRECT = "https://cynorra.github.io/autopost/callback";
+  document.getElementById("connect").addEventListener("click", function () {
+    var state = Math.random().toString(36).slice(2) + Date.now().toString(36);
+    try { sessionStorage.setItem("tt_state", state); } catch (e) {}
+    var q = new URLSearchParams({
+      client_key: CLIENT_KEY,
+      scope: "user.info.basic,video.publish",
+      response_type: "code",
+      redirect_uri: REDIRECT,
+      state: state
+    });
+    window.location.href = "https://www.tiktok.com/v2/auth/authorize/?" + q.toString();
+  });
+</script>
+</body>
+</html>

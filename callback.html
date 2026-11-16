@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect TikTok &ndash; CYNORAPHONK Autopost</title>
+<style>
+  body{font:16px/1.6 system-ui,sans-serif;max-width:720px;margin:2rem auto;padding:0 1rem;color:#eee;background:#0b0b10}
+  a{color:#ff7a3c}
+  .card{background:#16161f;border:1px solid #2a2a38;border-radius:12px;padding:1.2rem 1.4rem;margin:1.2rem 0}
+  code,textarea{font:14px ui-monospace,monospace}
+  textarea{width:100%;height:5.5rem;background:#0b0b10;color:#eee;border:1px solid #2a2a38;border-radius:8px;padding:.5rem}
+  button{font:600 15px system-ui;background:#ff2d55;color:#fff;border:0;border-radius:8px;padding:.5rem 1rem;cursor:pointer}
+  .ok{color:#5be08a} .bad{color:#ff6b6b}
+</style>
+</head>
+<body>
+<h1>TikTok connection</h1>
+<div class="card" id="result">Reading TikTok response&hellip;</div>
+<p><a href="./">&larr; Back</a> &middot; <a href="terms.html">Terms</a> &middot; <a href="privacy.html">Privacy</a></p>
+
+<script>
+  var p = new URLSearchParams(window.location.search);
+  var box = document.getElementById("result");
+  var saved = null;
+  try { saved = sessionStorage.getItem("tt_state"); } catch (e) {}
+
+  function esc(s){ return String(s).replace(/[&<>"]/g, function(c){ return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]; }); }
+
+  if (p.get("error")) {
+    box.innerHTML = '<p class="bad"><strong>Authorization was not completed.</strong></p><p>' +
+      esc(p.get("error")) + (p.get("error_description") ? ": " + esc(p.get("error_description")) : "") + "</p>";
+  } else if (!p.get("code")) {
+    box.innerHTML = "<p>No authorization code in the address. Start from the <a href=\"./\">home page</a>.</p>";
+  } else if (saved && p.get("state") !== saved) {
+    box.innerHTML = '<p class="bad"><strong>State mismatch.</strong> The request was not started from this browser session. Start again from the <a href="./">home page</a>.</p>';
+  } else {
+    var code = p.get("code");
+    box.innerHTML =
+      '<p class="ok"><strong>TikTok authorization successful.</strong></p>' +
+      "<p>The creator granted the requested permissions. Copy the one-time code below into the setup command to finish connecting the account:</p>" +
+      '<textarea id="code" readonly>' + esc(code) + "</textarea>" +
+      '<p><button id="copy">Copy code</button></p>' +
+      "<p><small>The code can be used only once and expires shortly. It is not stored by this page.</small></p>";
+    document.getElementById("copy").addEventListener("click", function () {
+      var t = document.getElementById("code"); t.select();
+      try { navigator.clipboard.writeText(t.value); } catch (e) { document.execCommand("copy"); }
+      this.textContent = "Copied";
+    });
+  }
+</script>
+</body>
+</html>
